@@ -58,12 +58,7 @@ async function submit() {
     // sign-in worked but nothing happened", so it is surfaced rather than ignored.
     if (failure !== undefined && failure !== null) {
       error.value = t('errors.sessionNotEstablished')
-      console.error('[login] navigation was refused after a successful sign-in', {
-        failure,
-        isAuthenticated: auth.isAuthenticated,
-        hasProfile: auth.profile !== null,
-        hasToken: auth.accessToken !== null,
-      })
+      console.error('[login] navigation was refused after a successful sign-in', failure)
     }
   } catch (caught) {
     // A route chunk that will not load. The session is live either way, so say so rather than
