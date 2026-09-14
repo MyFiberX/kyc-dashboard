@@ -22,7 +22,7 @@ export const API_V1 = '/api/v1'
  * Note this is public configuration, not a secret: everything in a VITE_ variable is compiled into
  * the bundle and readable by anyone who opens the page. No credential belongs here.
  */
-export const baseURL = import.meta.env.VITE_API_BASE_URL ?? ''
+const baseURL = import.meta.env.VITE_API_BASE_URL ?? ''
 
 /** A parsed API failure. Carries enough for the UI to react without re-reading the response. */
 export class ApiError extends Error {
