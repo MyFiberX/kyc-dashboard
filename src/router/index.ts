@@ -143,60 +143,25 @@ export const router = createRouter({
   scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 },
 })
 
-/**
- * Temporary: traces every guard decision to the console.
- *
- * A sign-in that reports success but leaves the operator on the login screen has to be one of these
- * decisions, and reading the code has not settled which. Remove once the cause is known.
- */
-function trace(stage: string, detail: Record<string, unknown>): void {
-  console.info(`[guard] ${stage}`, detail)
-}
-
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
-
-  trace('enter', {
-    to: to.fullPath,
-    name: String(to.name),
-    public: to.meta.public === true,
-    initializing: auth.initializing,
-    isAuthenticated: auth.isAuthenticated,
-    hasToken: auth.accessToken !== null,
-    hasProfile: auth.profile !== null,
-    role: auth.role,
-  })
 
   // On a hard load the session is restored from the stored refresh token before any decision is
   // made, so a reload on a protected page does not bounce the operator to the login screen.
   if (auth.initializing) {
     await auth.restore()
-
-    trace('after restore', {
-      isAuthenticated: auth.isAuthenticated,
-      hasToken: auth.accessToken !== null,
-      hasProfile: auth.profile !== null,
-    })
   }
 
   if (to.meta.public === true) {
     // Already signed in and heading for the login page: send them to the dashboard instead.
     if (to.name === 'login' && auth.isAuthenticated) {
-      trace('decision', { result: 'redirect to dashboard (already signed in)' })
       return { name: 'dashboard' }
     }
 
-    trace('decision', { result: 'allow (public route)' })
     return true
   }
 
   if (!auth.isAuthenticated) {
-    trace('decision', {
-      result: 'BOUNCE to login (not authenticated)',
-      hasToken: auth.accessToken !== null,
-      hasProfile: auth.profile !== null,
-    })
-
     // Remember where they were going, so signing in lands them there rather than on the dashboard.
     return { name: 'login', query: to.fullPath === '/' ? {} : { redirect: to.fullPath } }
   }
@@ -210,24 +175,8 @@ router.beforeEach(async (to) => {
       isSuperAdmin: auth.isSuperAdmin,
     })
   ) {
-    trace('decision', { result: 'FORBIDDEN', permission, isSuperAdmin: auth.isSuperAdmin })
     return { name: 'forbidden' }
   }
 
-  trace('decision', { result: 'allow' })
   return true
-})
-
-// A route component that fails to load rejects here rather than in the guard, and vue-router
-// reports it through onError - without this it is swallowed and the navigation simply stops.
-router.onError((error, to) => {
-  console.error('[guard] navigation error', { to: to.fullPath, error })
-})
-
-router.afterEach((to, from, failure) => {
-  if (failure !== undefined && failure !== null) {
-    console.error('[guard] navigation FAILED', { from: from.fullPath, to: to.fullPath, failure })
-  } else {
-    console.info('[guard] navigated', { from: from.fullPath, to: to.fullPath })
-  }
 })
