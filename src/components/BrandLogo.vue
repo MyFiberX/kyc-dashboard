@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { baseURL } from '@/api'
 import { useUiStore } from '@/stores/ui.store'
 
 /**
- * The FiberX lockup, served by the backend from /brand.
+ * The FiberX lockup, served by the backend from /brand - see `source` below for why that is
+ * resolved against the API base rather than written as a root-relative path.
  *
  * There are two files and the direction decides which: the Arabic layout uses the mirrored lockup
  * with the X on the left, exactly as the customer-facing pages do. The logo is sized by height and
@@ -21,9 +23,16 @@ withDefaults(defineProps<{ variant?: 'full' | 'mark'; className?: string }>(), {
 
 const ui = useUiStore()
 
-const source = computed(() =>
-  ui.locale === 'ar' ? '/brand/fiberx-logo-rtl.png' : '/brand/fiberx-logo.png',
-)
+/**
+ * The artwork is served by the API host, not bundled with the dashboard, so its URL is resolved
+ * against the same base as every API call. A bare `/brand/...` would resolve against the PAGE's
+ * origin, which is only the same host when the two are deployed together - split across hosts it
+ * asks the static host for a file that lives on the backend and renders a broken image.
+ */
+const source = computed(() => {
+  const file = ui.locale === 'ar' ? 'fiberx-logo-rtl.png' : 'fiberx-logo.png'
+  return `${baseURL}/brand/${file}`
+})
 </script>
 
 <template>
