@@ -28,10 +28,6 @@ async function submit() {
 
   try {
     await auth.signIn({ username: username.value, password: password.value })
-
-    // Land where they were headed before the guard intercepted them, if that was anywhere.
-    const redirect = route.query.redirect
-    await router.replace(typeof redirect === 'string' ? redirect : { name: 'dashboard' })
   } catch (caught) {
     // Every failure - unknown account, wrong password, deactivated, locked out - answers 401 with
     // one message, deliberately, so this endpoint cannot be used to discover which accounts exist.
@@ -45,6 +41,35 @@ async function submit() {
     }
 
     password.value = ''
+    return
+  }
+
+  // Navigation is deliberately outside the catch above. Sign-in has succeeded by this point, so a
+  // failure here is not a failed sign-in and must not be reported as one - doing so showed an error
+  // over an established session and cleared the password, with nothing to say what actually broke.
+  const redirect = route.query.redirect
+  const target = typeof redirect === 'string' ? redirect : { name: 'dashboard' }
+
+  try {
+    const failure = await router.replace(target)
+
+    // A guard that returns a redirect does not throw - router.replace resolves with a NavigationFailure
+    // instead, and awaiting it silently leaves the operator on this page. That is the shape of "the
+    // sign-in worked but nothing happened", so it is surfaced rather than ignored.
+    if (failure !== undefined && failure !== null) {
+      error.value = t('errors.sessionNotEstablished')
+      console.error('[login] navigation was refused after a successful sign-in', {
+        failure,
+        isAuthenticated: auth.isAuthenticated,
+        hasProfile: auth.profile !== null,
+        hasToken: auth.accessToken !== null,
+      })
+    }
+  } catch (caught) {
+    // A route chunk that will not load. The session is live either way, so say so rather than
+    // pretending the credentials were refused.
+    error.value = errorMessage(caught, t)
+    console.error('[login] signed in, but navigation threw', caught)
   }
 }
 
@@ -52,6 +77,7 @@ function chooseLocale(locale: AppLocale) {
   ui.setLocale(locale)
 }
 </script>
+
 
 <template>
   <div class="flex min-h-dvh flex-col bg-canvas dark:bg-brand-950">

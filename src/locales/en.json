@@ -408,6 +408,7 @@
     "503": "The service is temporarily unavailable. Please try again shortly.",
     "network": "Could not reach the server. Check your connection and try again.",
     "malformedResponse": "The server replied, but the response could not be used. Please try again, and tell your administrator if it continues.",
+    "sessionNotEstablished": "The sign-in succeeded but the session could not be opened. Please try again, and tell your administrator if it continues.",
     "unknown": "Something went wrong. Please try again.",
     "conflictReload": "Reload the latest version",
     "validationSummary": "Please correct the highlighted fields.",
