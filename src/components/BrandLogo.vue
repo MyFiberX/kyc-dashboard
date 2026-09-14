@@ -35,7 +35,11 @@ const source = computed(() =>
     v-if="variant === 'full'"
     :src="source"
     alt="FiberX"
-    :class="['h-8 w-auto max-w-[168px] object-contain object-left rtl:object-right', className]"
+    :class="[
+      'h-8 w-auto max-w-[168px] object-contain object-left rtl:object-right',
+      ui.locale === 'ar' ? '' : 'lockup-ltr',
+      className,
+    ]"
   />
 
   <!-- Collapsed rail: a window onto the X, never a squashed copy of the full lockup. -->
@@ -45,6 +49,29 @@ const source = computed(() =>
 </template>
 
 <style scoped>
+/*
+  The two source files are padded differently, so at one CSS height they render at two sizes.
+
+  Measured from the artwork: the Arabic file's ink spans 0.4%-99.4% of its canvas height, filling
+  it, while the English file's spans 8.8%-88.6% - a fifth of its height is transparent padding.
+  Sized by height, the English lockup therefore draws about 20% smaller and, because the padding is
+  uneven (8.8% above against 11.4% below), its ink centres at 48.7% rather than 50%.
+
+  The artwork is left untouched, so this is corrected here: scale by 99.0/79.8 to make the two inks
+  the same height, and nudge down by the 1.3% the ink sits proud of centre. transform is used
+  rather than a larger h-, so the element keeps the same 32px layout box and nothing around it
+  shifts. transform-origin is the leading edge so the logo still starts where the text below it
+  does, mirrored under RTL - though RTL never takes this class, it costs nothing to keep correct.
+*/
+.lockup-ltr {
+  transform: scale(1.24) translateY(1.3%);
+  transform-origin: left center;
+}
+
+[dir='rtl'] .lockup-ltr {
+  transform-origin: right center;
+}
+
 /*
   The collapsed mark is a window onto the X, not a resize of the lockup.
 
