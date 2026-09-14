@@ -133,6 +133,29 @@ describe('API client administration', () => {
   })
 })
 
+describe('the response envelope', () => {
+  it('treats success:false as a failure even when the status is 200', async () => {
+    // The backend can report a refusal inside a 200 envelope. Reading only `data` would hand the
+    // caller null and let the failure travel on as an apparently-good value.
+    mock.onGet('/api/v1/kyc/abc').reply(200, {
+      success: false,
+      message: 'Not permitted.',
+      data: null,
+      meta: null,
+    })
+
+    await expect(kycApi.getKycRecord('abc')).rejects.toMatchObject({
+      message: 'Not permitted.',
+    })
+  })
+
+  it('still allows a success envelope that legitimately carries no data', async () => {
+    mock.onGet('/api/v1/kyc/abc').reply(200, envelope(null))
+
+    await expect(kycApi.getKycRecord('abc')).resolves.toBeNull()
+  })
+})
+
 describe('queryParams', () => {
   it('drops empty values so a cleared filter disappears from the URL', () => {
     expect(

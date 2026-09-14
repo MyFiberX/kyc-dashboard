@@ -75,7 +75,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loadProfile(): Promise<void> {
-    profile.value = await authApi.getProfile()
+    const loaded = await authApi.getProfile()
+
+    // A 200 whose body is not a usable profile would otherwise leave profile null, which reads as
+    // "not signed in" - the session would look established while every guard bounced back to the
+    // login screen with nothing to explain it. Fail here, where the cause is still visible.
+    if (loaded === null || typeof loaded !== 'object' || typeof loaded.id !== 'string') {
+      throw new ApiError(0, 'The profile response was not usable.', {}, null)
+    }
+
+    profile.value = loaded
   }
 
   async function signIn(credentials: LoginRequest): Promise<void> {
@@ -83,6 +92,13 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const tokens = await authApi.login(credentials)
+
+      // Guard the shape before trusting it: reading .accessToken off a null body would throw a
+      // TypeError, which the view cannot tell from any other bug and reports as a generic failure.
+      if (tokens === null || typeof tokens !== 'object' || typeof tokens.accessToken !== 'string') {
+        throw new ApiError(0, 'The sign-in response was not usable.', {}, null)
+      }
+
       setSession(tokens)
 
       try {

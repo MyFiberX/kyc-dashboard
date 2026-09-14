@@ -61,6 +61,38 @@ describe('auth store', () => {
     expect(auth.role).toBe('Admin')
   })
 
+  /**
+   * The failure that is worst to diagnose is the one that does not look like a failure: the API
+   * answers 200, nothing throws, and the operator is returned to the login screen with no reason
+   * given. These assert that a response which is not usable is rejected where it arrives.
+   */
+  describe('a 200 that is not a usable session', () => {
+    it('refuses a login response with no token, rather than half-establishing a session', async () => {
+      // What an envelope with success:true and a null body unwraps to.
+      vi.mocked(authApi.login).mockResolvedValue(null as never)
+
+      const auth = useAuthStore()
+      await expect(auth.signIn({ username: 'operator', password: 'secret' })).rejects.toThrow()
+
+      expect(auth.isAuthenticated).toBe(false)
+      expect(auth.accessToken).toBeNull()
+    })
+
+    it('refuses a profile response that is not a profile, and leaves no session behind', async () => {
+      vi.mocked(authApi.login).mockResolvedValue(TOKENS)
+      vi.mocked(authApi.getProfile).mockResolvedValue(null as never)
+
+      const auth = useAuthStore()
+      await expect(auth.signIn({ username: 'operator', password: 'secret' })).rejects.toThrow()
+
+      // Without this the store would hold a token but no profile: isAuthenticated reads false, so
+      // every guard bounces back to login while the sign-in itself reported success.
+      expect(auth.isAuthenticated).toBe(false)
+      expect(auth.accessToken).toBeNull()
+      expect(window.sessionStorage.getItem('kyc.rt')).toBeNull()
+    })
+  })
+
   it('never writes the access token to storage', async () => {
     vi.mocked(authApi.login).mockResolvedValue(TOKENS)
     vi.mocked(authApi.getProfile).mockResolvedValue(PROFILE)

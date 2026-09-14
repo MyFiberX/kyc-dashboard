@@ -265,6 +265,14 @@ export async function remove(url: string, config?: AxiosRequestConfig): Promise<
 }
 
 function unwrap<T>(envelope: ApiResponse<T>): T {
+  // The envelope carries its own verdict, and it is not always the HTTP status: the backend can
+  // answer 200 with success:false. Reading only `data` in that case yields null and the failure
+  // travels on as an apparently-good value - a signed-in session with no profile, say, which then
+  // fails somewhere far from the cause. Honour the envelope's own verdict instead.
+  if (envelope.success === false) {
+    throw new ApiError(0, typeof envelope.message === 'string' ? envelope.message : '', {}, null)
+  }
+
   if (envelope.data === null || envelope.data === undefined) {
     // A success envelope with no data is legitimate on routes like logout, whose contract is
     // ApiResponse<object> carrying null. Callers there use `post<null>`.
