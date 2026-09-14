@@ -1,4 +1,4 @@
-import { ApiError, CanceledError } from '@/api'
+import { ApiError, CanceledError, MALFORMED_RESPONSE } from '@/api'
 
 /**
  * Turns any thrown value into a message the operator should see.
@@ -19,6 +19,13 @@ export function errorMessage(error: unknown, t: Translate): string {
   if (error instanceof CanceledError) return ''
 
   if (error instanceof ApiError) {
+    // The request succeeded but its body was unusable. Saying "check your connection" here would
+    // send the operator looking in the wrong place, so this carries its own message - and the
+    // server's own text when it gave one, which is what explains a success:false envelope.
+    if (error.status === MALFORMED_RESPONSE) {
+      return error.message !== '' ? error.message : t('errors.malformedResponse')
+    }
+
     // No response at all - the request never reached the server.
     if (error.status === 0) return t('errors.network')
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-import { authApi, configureAuth, ApiError } from '@/api'
+import { authApi, configureAuth, ApiError, MALFORMED_RESPONSE } from '@/api'
 import type { LoginRequest, OperatorProfile, OperatorRole } from '@/api'
 
 /**
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
     // "not signed in" - the session would look established while every guard bounced back to the
     // login screen with nothing to explain it. Fail here, where the cause is still visible.
     if (loaded === null || typeof loaded !== 'object' || typeof loaded.id !== 'string') {
-      throw new ApiError(0, 'The profile response was not usable.', {}, null)
+      throw new ApiError(MALFORMED_RESPONSE, '', {}, null)
     }
 
     profile.value = loaded
@@ -96,7 +96,7 @@ export const useAuthStore = defineStore('auth', () => {
       // Guard the shape before trusting it: reading .accessToken off a null body would throw a
       // TypeError, which the view cannot tell from any other bug and reports as a generic failure.
       if (tokens === null || typeof tokens !== 'object' || typeof tokens.accessToken !== 'string') {
-        throw new ApiError(0, 'The sign-in response was not usable.', {}, null)
+        throw new ApiError(MALFORMED_RESPONSE, '', {}, null)
       }
 
       setSession(tokens)

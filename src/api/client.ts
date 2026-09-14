@@ -62,6 +62,14 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * The status on an ApiError raised by this client rather than by the server: the request completed,
+ * but its body was not something the caller can use. Distinct from 0, which means the request never
+ * reached the server at all - the two need different messages, since "check your connection" is
+ * actively misleading when the connection was fine and the payload was not.
+ */
+export const MALFORMED_RESPONSE = -1
+
 /** A request that was deliberately cancelled - a superseded search, or a page left early. */
 export class CanceledError extends Error {
   constructor() {
@@ -270,7 +278,12 @@ function unwrap<T>(envelope: ApiResponse<T>): T {
   // travels on as an apparently-good value - a signed-in session with no profile, say, which then
   // fails somewhere far from the cause. Honour the envelope's own verdict instead.
   if (envelope.success === false) {
-    throw new ApiError(0, typeof envelope.message === 'string' ? envelope.message : '', {}, null)
+    throw new ApiError(
+      MALFORMED_RESPONSE,
+      typeof envelope.message === 'string' ? envelope.message : '',
+      {},
+      null,
+    )
   }
 
   if (envelope.data === null || envelope.data === undefined) {
