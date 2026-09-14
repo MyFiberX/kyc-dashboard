@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.local
+
+# Local environment overrides. .env.example, .env.development and .env.production are committed;
+# they hold public configuration only.
+.env.production
+.env.*.local
+
+.DS_Store
+*.tsbuildinfo

@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink antialiased dark:bg-brand-950 dark:text-slate-100;
+    margin: 0;
+    /* Arabic needs a face that actually has the glyphs; the stack matches the customer pages. */
+    font-family:
+      'Segoe UI', system-ui, -apple-system, 'Noto Sans Arabic', Tahoma, Arial, sans-serif;
+  }
+
+  /* A visible focus ring everywhere, for keyboard navigation. Never removed without a replacement. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-600 ring-offset-2 ring-offset-white dark:ring-brand-300 dark:ring-offset-brand-950;
+  }
+
+  /* Numbers read left-to-right even in an RTL layout: a reference number or a price must not be
+     reordered by the bidi algorithm. */
+  .numeric {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* The dropdown a native select opens is painted by the platform, not composited over the page, so
+     it takes none of the control's own background. A translucent one - the dark field is white at
+     5% - therefore resolves against the popup's white ground while the text stays light, which left
+     the options nearly invisible. These give every option an opaque colour of its own so the list is
+     legible wherever the platform draws it. */
+  :root.dark select option,
+  :root.dark select optgroup {
+    background-color: theme('colors.brand.950');
+    color: theme('colors.slate.100');
+  }
+
+  :root.dark select option:disabled {
+    color: theme('colors.slate.500');
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.03];
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink dark:text-slate-200;
+  }
+
+  .field-hint {
+    @apply mt-1 text-xs text-muted dark:text-slate-400;
+  }
+
+  .field-error {
+    @apply mt-1 text-xs font-medium text-accent-600 dark:text-accent-300;
+  }
+
+  /* One table style, so every listing in the console looks like the same product. */
+  .data-table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .data-table thead th {
+    @apply whitespace-nowrap px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-muted dark:text-slate-400;
+  }
+
+  .data-table tbody td {
+    @apply border-t border-line px-4 py-3 align-middle dark:border-white/10;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-brand-50/50 dark:bg-white/[0.04];
+  }
+}
+
+/* Respect a reduced-motion preference: transitions are decoration, never information. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
