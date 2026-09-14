@@ -10,6 +10,27 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        /*
+          Chunks are named by hash alone, not by what they contain.
+
+          Vite's default names a chunk after its source - an icon module becomes `plus-<hash>.js`,
+          `share-2-<hash>.js`, and so on. Those names match the filter lists ad blockers ship, so
+          the extension cancels the request; the browser then hands the page an empty text/html
+          response, the dynamic import rejects, and a route that needs that chunk simply never
+          loads. It presented as signing in successfully and never leaving the login screen.
+
+          The file is not an advert, but nothing about the request says so - only the name is
+          visible to a filter. Hashes carry no words to match, so the block cannot trigger.
+        */
+        chunkFileNames: 'assets/[hash].js',
+        entryFileNames: 'assets/[hash].js',
+        assetFileNames: 'assets/[hash][extname]',
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

@@ -61,9 +61,13 @@ async function submit() {
       console.error('[login] navigation was refused after a successful sign-in', failure)
     }
   } catch (caught) {
-    // A route chunk that will not load. The session is live either way, so say so rather than
-    // pretending the credentials were refused.
-    error.value = errorMessage(caught, t)
+    // A route chunk that would not load. The session is live either way, so this never reports a
+    // credentials failure - and a failed dynamic import gets its own message, because the generic
+    // one sends the operator to check a password that was already accepted.
+    const isChunkFailure =
+      caught instanceof TypeError && /dynamically imported module|Importing a module/i.test(caught.message)
+
+    error.value = isChunkFailure ? t('errors.assetBlocked') : errorMessage(caught, t)
     console.error('[login] signed in, but navigation threw', caught)
   }
 }
