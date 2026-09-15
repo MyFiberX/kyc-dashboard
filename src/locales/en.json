@@ -115,6 +115,7 @@
     "monthlyPrice": "Monthly price",
     "priceAtSubmission": "Price at submission",
     "totalPrice": "Total",
+    "discountCouponCode": "Discount coupon",
     "campaign": "Campaign",
     "campaignCode": "Campaign code",
     "status": "Status",

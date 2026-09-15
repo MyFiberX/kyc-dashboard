@@ -285,13 +285,14 @@ const activeFilterCount = computed(
                 <th scope="col">{{ $t('kyc.province') }}</th>
                 <th scope="col">{{ $t('kyc.subscription') }}</th>
                 <th scope="col">{{ $t('kyc.totalPrice') }}</th>
+                <th scope="col">{{ $t('kyc.discountCouponCode') }}</th>
                 <th scope="col">{{ $t('kyc.status') }}</th>
                 <th scope="col">{{ $t('kyc.createdAt') }}</th>
               </tr>
             </thead>
 
             <tbody>
-              <AppSkeleton v-if="query.loading.value" :rows="8" :columns="8" />
+              <AppSkeleton v-if="query.loading.value" :rows="8" :columns="9" />
 
               <tr
                 v-for="record in query.items.value"
@@ -312,6 +313,10 @@ const activeFilterCount = computed(
                 <td class="max-w-[160px] truncate">{{ record.internetSubscriptionName }}</td>
                 <td class="numeric whitespace-nowrap">
                   {{ formatCurrency(record.totalPrice, ui.locale) }}
+                </td>
+                <td class="numeric max-w-[140px] truncate">
+                  <span v-if="record.discountCouponCode">{{ record.discountCouponCode }}</span>
+                  <span v-else class="text-muted dark:text-slate-500">—</span>
                 </td>
                 <td>
                   <AppBadge
@@ -362,6 +367,9 @@ const activeFilterCount = computed(
             <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted dark:text-slate-400">
               <span>{{ record.provinceName }} · {{ record.regionName }}</span>
               <span class="numeric">{{ formatCurrency(record.totalPrice, ui.locale) }}</span>
+              <span v-if="record.discountCouponCode" class="numeric">
+                {{ record.discountCouponCode }}
+              </span>
               <span>{{ formatDateShort(record.createdAt, ui.locale) }}</span>
             </div>
           </RouterLink>

@@ -184,6 +184,7 @@ export interface KycRecord {
   isLateAttribution: boolean
   apiClientId: string | null
   externalReferenceId: string | null
+  discountCouponCode: string | null
   coordinateWarning: boolean
   isDuplicate: boolean
   duplicateOfKycId: string | null

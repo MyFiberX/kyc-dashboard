@@ -115,6 +115,7 @@
     "monthlyPrice": "السعر الشهري",
     "priceAtSubmission": "السعر عند التقديم",
     "totalPrice": "المبلغ الإجمالي",
+    "discountCouponCode": "قسيمة الخصم",
     "campaign": "الحملة",
     "campaignCode": "كود الحملة",
     "status": "الحالة",

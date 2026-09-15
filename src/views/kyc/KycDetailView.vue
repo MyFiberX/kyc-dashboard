@@ -324,6 +324,14 @@ const actorLabel = (entry: KycStatusHistoryEntry) => {
                   {{ formatCurrency(record.totalPrice, ui.locale) }}
                 </dd>
               </div>
+              <div v-if="record.discountCouponCode">
+                <dt class="text-xs text-muted dark:text-slate-400">
+                  {{ $t('kyc.discountCouponCode') }}
+                </dt>
+                <dd class="numeric text-sm text-ink dark:text-slate-100">
+                  {{ record.discountCouponCode }}
+                </dd>
+              </div>
             </dl>
           </section>
 
