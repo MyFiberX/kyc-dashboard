@@ -112,6 +112,7 @@
     "coordinates": "Coordinates",
     "subscription": "Subscription plan",
     "duration": "Duration",
+    "durationFixed": "New subscriptions are fixed at 3 months.",
     "monthlyPrice": "Monthly price",
     "priceAtSubmission": "Price at submission",
     "totalPrice": "Total",
@@ -120,6 +121,8 @@
     "campaignCode": "Campaign code",
     "status": "Status",
     "deviceType": "Device",
+    "currentInternetProvider": "Current internet provider",
+    "notProvided": "Not provided",
     "createdAt": "Submitted",
     "updatedAt": "Updated",
     "statusChangedAt": "Status changed",
@@ -362,6 +365,11 @@
     "Unknown": "Unknown",
     "Web": "Web",
     "Mobile": "Mobile"
+  },
+  "internetServiceType": {
+    "Fiber": "Fiber Internet",
+    "WiFi": "Wi-Fi Internet (Towers)",
+    "Mobile": "Mobile Internet"
   },
   "table": {
     "rowsPerPage": "Rows per page",

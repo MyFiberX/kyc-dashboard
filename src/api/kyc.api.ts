@@ -2,6 +2,7 @@ import { API_V1, get, getPage, post, put, queryParams, remove, type Page } from 
 import type {
   AnalyticsWindowParams,
   CreateKycRequest,
+  InternetServiceTypeOption,
   KycCampaignBreakdown,
   KycDailyPoint,
   KycListParams,
@@ -45,6 +46,19 @@ export function getKycHistory(
 export function getKycStatuses(signal?: AbortSignal): Promise<KycStatusOption[]> {
   return get<KycStatusOption[]>(`${BASE}/statuses`, { signal })
 }
+
+/** GET /api/v1/kyc/internet-service-types - the "current internet provider" catalogue. */
+export function getInternetServiceTypes(
+  signal?: AbortSignal,
+): Promise<InternetServiceTypeOption[]> {
+  return get<InternetServiceTypeOption[]>(`${BASE}/internet-service-types`, { signal })
+}
+
+/**
+ * The only subscription duration, in months, that creation accepts - anything else is refused with
+ * 400. Older records can still carry other durations, so display the stored value, never this.
+ */
+export const SUBSCRIPTION_DURATION_MONTHS = 3
 
 /**
  * POST /api/v1/kyc

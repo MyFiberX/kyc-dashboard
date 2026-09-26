@@ -112,6 +112,7 @@
     "coordinates": "الإحداثيات",
     "subscription": "باقة الإنترنت",
     "duration": "مدة الاشتراك",
+    "durationFixed": "مدة الاشتراكات الجديدة ثابتة على 3 أشهر.",
     "monthlyPrice": "السعر الشهري",
     "priceAtSubmission": "السعر عند التقديم",
     "totalPrice": "المبلغ الإجمالي",
@@ -120,6 +121,8 @@
     "campaignCode": "كود الحملة",
     "status": "الحالة",
     "deviceType": "الجهاز",
+    "currentInternetProvider": "مزود الإنترنت الحالي",
+    "notProvided": "غير محدد",
     "createdAt": "تاريخ التقديم",
     "updatedAt": "آخر تحديث",
     "statusChangedAt": "تاريخ تغيير الحالة",
@@ -362,6 +365,11 @@
     "Unknown": "غير معروف",
     "Web": "متصفح",
     "Mobile": "هاتف"
+  },
+  "internetServiceType": {
+    "Fiber": "Internet ضوئي",
+    "WiFi": "Internet وايفاي / أبراج",
+    "Mobile": "Internet هاتف"
   },
   "table": {
     "rowsPerPage": "عدد الصفوف",

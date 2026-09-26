@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { INTERNET_SERVICE_TYPES } from '@/api'
 import ar from '@/locales/ar.json'
 import en from '@/locales/en.json'
 import { LOCALE_CULTURE, LOCALE_DIRECTION, SUPPORTED_LOCALES } from '@/i18n'
@@ -58,6 +59,13 @@ describe('translations', () => {
     for (const status of ['Pending', 'NoAnswer', 'InProcess', 'Completed']) {
       expect(en.status).toHaveProperty(status)
       expect(ar.status).toHaveProperty(status)
+    }
+  })
+
+  it('labels every internet service type the backend sends', () => {
+    for (const type of INTERNET_SERVICE_TYPES) {
+      expect(en.internetServiceType).toHaveProperty(type)
+      expect(ar.internetServiceType).toHaveProperty(type)
     }
   })
 })

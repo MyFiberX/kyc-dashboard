@@ -284,6 +284,21 @@ const actorLabel = (entry: KycStatusHistoryEntry) => {
                   {{ $t(`deviceType.${record.deviceType}`) }}
                 </dd>
               </div>
+              <!-- Always shown: null is a real answer here - older records predate the question. -->
+              <div>
+                <dt class="text-xs text-muted dark:text-slate-400">
+                  {{ $t('kyc.currentInternetProvider') }}
+                </dt>
+                <dd
+                  v-if="record.currentInternetProvider"
+                  class="text-sm text-ink dark:text-slate-100"
+                >
+                  {{ $t(`internetServiceType.${record.currentInternetProvider}`) }}
+                </dd>
+                <dd v-else class="text-sm text-muted dark:text-slate-500">
+                  {{ $t('kyc.notProvided') }}
+                </dd>
+              </div>
             </dl>
           </section>
 

@@ -56,7 +56,7 @@ describe('KYC endpoints', () => {
         provinceId: 'p',
         regionId: 'r',
         internetSubscriptionId: 's',
-        subscriptionDuration: 12,
+        subscriptionDuration: 3,
       },
       'key-123',
     )
@@ -89,6 +89,19 @@ describe('KYC endpoints', () => {
       '/api/v1/kyc/daily',
       '/api/v1/kyc/by-campaign',
     ])
+  })
+
+  it('reads the internet service type catalogue from its lookup route', async () => {
+    mock.onGet('/api/v1/kyc/internet-service-types').reply(200, envelope([]))
+
+    await kycApi.getInternetServiceTypes()
+
+    expect(mock.history.get[0]?.url).toBe('/api/v1/kyc/internet-service-types')
+  })
+
+  it('sends the only subscription duration the backend accepts', () => {
+    // Any other value is refused with 400.
+    expect(kycApi.SUBSCRIPTION_DURATION_MONTHS).toBe(3)
   })
 
   it("mirrors the backend's analytics window limits", () => {

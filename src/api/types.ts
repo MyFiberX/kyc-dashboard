@@ -44,6 +44,10 @@ export type KycStatus = (typeof KYC_STATUSES)[number]
 export const DEVICE_TYPES = ['Unknown', 'Mobile', 'Web'] as const
 export type DeviceType = (typeof DEVICE_TYPES)[number]
 
+/** InternetServiceType - the customer's current provider; numeric ids are 1..3. */
+export const INTERNET_SERVICE_TYPES = ['Fiber', 'WiFi', 'Mobile'] as const
+export type InternetServiceType = (typeof INTERNET_SERVICE_TYPES)[number]
+
 /** PublicLinkState - the state a record's public result link is in. */
 export type PublicLinkState = 'Active' | 'Disabled' | 'Expired'
 
@@ -162,6 +166,7 @@ export interface KycRecord {
   internetSubscriptionId: string
   internetSubscriptionName: string
   internetSubscriptionPrice: number
+  /** In months. New records are always 3, but older ones keep whatever they were saved with. */
   subscriptionDuration: number
   totalPrice: number
   createdAt: string
@@ -185,6 +190,8 @@ export interface KycRecord {
   apiClientId: string | null
   externalReferenceId: string | null
   discountCouponCode: string | null
+  /** Null on records created before the field existed, and on submissions that left it out. */
+  currentInternetProvider: InternetServiceType | null
   coordinateWarning: boolean
   isDuplicate: boolean
   duplicateOfKycId: string | null
@@ -200,10 +207,12 @@ export interface CreateKycRequest {
   locationLat?: number | null
   locationLng?: number | null
   internetSubscriptionId: string
-  subscriptionDuration: number
+  /** The backend accepts 3 and nothing else - see SUBSCRIPTION_DURATION_MONTHS. */
+  subscriptionDuration: 3
   campaignCode?: string | null
   deviceType?: DeviceType | null
   externalReferenceId?: string | null
+  currentInternetProvider?: InternetServiceType | null
 }
 
 /** The update contract is status-only: it is the single field the backend accepts here. */
@@ -214,6 +223,12 @@ export interface UpdateKycRequest {
 export interface KycStatusOption {
   id: number
   value: KycStatus
+  label: string
+}
+
+export interface InternetServiceTypeOption {
+  id: number
+  value: InternetServiceType
   label: string
 }
 

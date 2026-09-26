@@ -286,13 +286,14 @@ const activeFilterCount = computed(
                 <th scope="col">{{ $t('kyc.subscription') }}</th>
                 <th scope="col">{{ $t('kyc.totalPrice') }}</th>
                 <th scope="col">{{ $t('kyc.discountCouponCode') }}</th>
+                <th scope="col">{{ $t('kyc.currentInternetProvider') }}</th>
                 <th scope="col">{{ $t('kyc.status') }}</th>
                 <th scope="col">{{ $t('kyc.createdAt') }}</th>
               </tr>
             </thead>
 
             <tbody>
-              <AppSkeleton v-if="query.loading.value" :rows="8" :columns="9" />
+              <AppSkeleton v-if="query.loading.value" :rows="8" :columns="10" />
 
               <tr
                 v-for="record in query.items.value"
@@ -316,6 +317,12 @@ const activeFilterCount = computed(
                 </td>
                 <td class="numeric max-w-[140px] truncate">
                   <span v-if="record.discountCouponCode">{{ record.discountCouponCode }}</span>
+                  <span v-else class="text-muted dark:text-slate-500">—</span>
+                </td>
+                <td class="whitespace-nowrap">
+                  <span v-if="record.currentInternetProvider">
+                    {{ $t(`internetServiceType.${record.currentInternetProvider}`) }}
+                  </span>
                   <span v-else class="text-muted dark:text-slate-500">—</span>
                 </td>
                 <td>
@@ -369,6 +376,9 @@ const activeFilterCount = computed(
               <span class="numeric">{{ formatCurrency(record.totalPrice, ui.locale) }}</span>
               <span v-if="record.discountCouponCode" class="numeric">
                 {{ record.discountCouponCode }}
+              </span>
+              <span v-if="record.currentInternetProvider">
+                {{ $t(`internetServiceType.${record.currentInternetProvider}`) }}
               </span>
               <span>{{ formatDateShort(record.createdAt, ui.locale) }}</span>
             </div>

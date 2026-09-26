@@ -5,10 +5,12 @@ import { useRouter } from 'vue-router'
 import { ArrowLeft } from 'lucide-vue-next'
 
 import {
+  INTERNET_SERVICE_TYPES,
   kycApi,
   masterDataApi,
   subscriptionApi,
   type CreateKycRequest,
+  type InternetServiceType,
   type Province,
   type Region,
   type Subscription,
@@ -32,7 +34,8 @@ const form = ref({
   provinceId: '' as string,
   regionId: '' as string,
   internetSubscriptionId: '' as string,
-  subscriptionDuration: 12,
+  // Optional: the placeholder option clears it back to null.
+  currentInternetProvider: '' as InternetServiceType | '' | null,
   campaignCode: '',
   externalReferenceId: '',
 })
@@ -110,6 +113,16 @@ const subscriptionOptions = computed(() =>
   })),
 )
 
+/** The backend accepts one duration, so it is shown as a fixed choice rather than an input. */
+const durationOptions = computed(() => {
+  const count = kycApi.SUBSCRIPTION_DURATION_MONTHS
+  return [{ value: String(count), label: t('kyc.months', { count }, count) }]
+})
+
+const providerOptions = computed(() =>
+  INTERNET_SERVICE_TYPES.map((type) => ({ value: type, label: t(`internetServiceType.${type}`) })),
+)
+
 const selectedPlan = computed(() =>
   subscriptions.value.find((plan) => plan.id === form.value.internetSubscriptionId) ?? null,
 )
@@ -119,7 +132,7 @@ const estimatedTotal = computed(() => {
   const plan = selectedPlan.value
   if (plan === null) return null
 
-  return plan.price * form.value.subscriptionDuration
+  return plan.price * kycApi.SUBSCRIPTION_DURATION_MONTHS
 })
 
 /** Mirrors the DTO's own constraints, so obvious mistakes are caught before a round trip. */
@@ -141,11 +154,6 @@ function validate(): boolean {
   if (form.value.regionId === '') errors.regionId = t('validation.required')
   if (form.value.internetSubscriptionId === '') {
     errors.internetSubscriptionId = t('validation.required')
-  }
-
-  const duration = Number(form.value.subscriptionDuration)
-  if (!Number.isInteger(duration) || duration < 1 || duration > 36) {
-    errors.subscriptionDuration = t('validation.min', { min: 1 })
   }
 
   localErrors.value = errors
@@ -172,10 +180,13 @@ async function submit() {
     provinceId: form.value.provinceId,
     regionId: form.value.regionId,
     internetSubscriptionId: form.value.internetSubscriptionId,
-    subscriptionDuration: Number(form.value.subscriptionDuration),
+    subscriptionDuration: kycApi.SUBSCRIPTION_DURATION_MONTHS,
   }
 
   if (form.value.email.trim() !== '') payload.email = form.value.email.trim()
+  if (form.value.currentInternetProvider) {
+    payload.currentInternetProvider = form.value.currentInternetProvider
+  }
   if (form.value.nearAddressPoint.trim() !== '') {
     payload.nearAddressPoint = form.value.nearAddressPoint.trim()
   }
@@ -289,15 +300,21 @@ async function submit() {
             :error="errors.internetSubscriptionId"
             required
           />
-          <AppInput
-            v-model="form.subscriptionDuration"
+          <AppSelect
+            :model-value="durationOptions[0]?.value"
+            :options="durationOptions"
             :label="$t('kyc.duration')"
+            :hint="$t('kyc.durationFixed')"
             :error="errors.subscriptionDuration"
-            type="number"
-            :min="1"
-            :max="36"
-            numeric
+            disabled
             required
+          />
+          <AppSelect
+            v-model="form.currentInternetProvider"
+            :options="providerOptions"
+            :label="$t('kyc.currentInternetProvider')"
+            :placeholder="$t('kyc.notProvided')"
+            :error="errors.currentInternetProvider"
           />
         </div>
 
