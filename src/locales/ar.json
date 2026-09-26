@@ -112,7 +112,7 @@
     "coordinates": "الإحداثيات",
     "subscription": "باقة الإنترنت",
     "duration": "مدة الاشتراك",
-    "durationFixed": "مدة الاشتراكات الجديدة ثابتة على 3 أشهر.",
+    "durationHint": "مدة الاشتراكات الجديدة شهر أو شهران أو 3 أشهر.",
     "monthlyPrice": "السعر الشهري",
     "priceAtSubmission": "السعر عند التقديم",
     "totalPrice": "المبلغ الإجمالي",

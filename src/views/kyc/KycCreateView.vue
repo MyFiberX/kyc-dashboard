@@ -34,6 +34,8 @@ const form = ref({
   provinceId: '' as string,
   regionId: '' as string,
   internetSubscriptionId: '' as string,
+  // A string because that is what a select holds; parsed back to months by selectedDuration.
+  subscriptionDuration: String(kycApi.DEFAULT_SUBSCRIPTION_DURATION),
   // Optional: the placeholder option clears it back to null.
   currentInternetProvider: '' as InternetServiceType | '' | null,
   campaignCode: '',
@@ -113,11 +115,17 @@ const subscriptionOptions = computed(() =>
   })),
 )
 
-/** The backend accepts one duration, so it is shown as a fixed choice rather than an input. */
-const durationOptions = computed(() => {
-  const count = kycApi.SUBSCRIPTION_DURATION_MONTHS
-  return [{ value: String(count), label: t('kyc.months', { count }, count) }]
-})
+/** Only the durations the backend accepts are offered, so the choice cannot be refused. */
+const durationOptions = computed(() =>
+  kycApi.SUBSCRIPTION_DURATIONS.map((count) => ({
+    value: String(count),
+    label: t('kyc.months', { count }, count),
+  })),
+)
+
+const selectedDuration = computed(() =>
+  kycApi.SUBSCRIPTION_DURATIONS.find((count) => String(count) === form.value.subscriptionDuration),
+)
 
 const providerOptions = computed(() =>
   INTERNET_SERVICE_TYPES.map((type) => ({ value: type, label: t(`internetServiceType.${type}`) })),
@@ -130,9 +138,10 @@ const selectedPlan = computed(() =>
 /** Shown so the operator can confirm the figure with the customer before submitting. */
 const estimatedTotal = computed(() => {
   const plan = selectedPlan.value
-  if (plan === null) return null
+  const duration = selectedDuration.value
+  if (plan === null || duration === undefined) return null
 
-  return plan.price * kycApi.SUBSCRIPTION_DURATION_MONTHS
+  return plan.price * duration
 })
 
 /** Mirrors the DTO's own constraints, so obvious mistakes are caught before a round trip. */
@@ -155,6 +164,7 @@ function validate(): boolean {
   if (form.value.internetSubscriptionId === '') {
     errors.internetSubscriptionId = t('validation.required')
   }
+  if (selectedDuration.value === undefined) errors.subscriptionDuration = t('validation.required')
 
   localErrors.value = errors
   return Object.keys(errors).length === 0
@@ -165,7 +175,9 @@ const errors = computed(() => ({ ...serverErrors.value, ...localErrors.value }))
 async function submit() {
   serverErrors.value = {}
 
-  if (!validate()) {
+  // validate() already rejects a missing duration; checking it here narrows the type as well.
+  const duration = selectedDuration.value
+  if (!validate() || duration === undefined) {
     ui.notify('error', t('errors.validationSummary'))
     return
   }
@@ -180,7 +192,7 @@ async function submit() {
     provinceId: form.value.provinceId,
     regionId: form.value.regionId,
     internetSubscriptionId: form.value.internetSubscriptionId,
-    subscriptionDuration: kycApi.SUBSCRIPTION_DURATION_MONTHS,
+    subscriptionDuration: duration,
   }
 
   if (form.value.email.trim() !== '') payload.email = form.value.email.trim()
@@ -301,12 +313,11 @@ async function submit() {
             required
           />
           <AppSelect
-            :model-value="durationOptions[0]?.value"
+            v-model="form.subscriptionDuration"
             :options="durationOptions"
             :label="$t('kyc.duration')"
-            :hint="$t('kyc.durationFixed')"
+            :hint="$t('kyc.durationHint')"
             :error="errors.subscriptionDuration"
-            disabled
             required
           />
           <AppSelect

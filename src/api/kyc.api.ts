@@ -55,10 +55,11 @@ export function getInternetServiceTypes(
 }
 
 /**
- * The only subscription duration, in months, that creation accepts - anything else is refused with
- * 400. Older records can still carry other durations, so display the stored value, never this.
+ * The subscription durations, in months, that creation accepts - anything else is refused with
+ * 400. Older records can still carry other durations, so display the stored value, never these.
  */
-export const SUBSCRIPTION_DURATION_MONTHS = 3
+export const SUBSCRIPTION_DURATIONS = [1, 2, 3] as const
+export const DEFAULT_SUBSCRIPTION_DURATION = 3
 
 /**
  * POST /api/v1/kyc

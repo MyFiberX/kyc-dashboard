@@ -166,7 +166,7 @@ export interface KycRecord {
   internetSubscriptionId: string
   internetSubscriptionName: string
   internetSubscriptionPrice: number
-  /** In months. New records are always 3, but older ones keep whatever they were saved with. */
+  /** In months. New records are 1, 2 or 3, but older ones keep whatever they were saved with. */
   subscriptionDuration: number
   totalPrice: number
   createdAt: string
@@ -207,8 +207,8 @@ export interface CreateKycRequest {
   locationLat?: number | null
   locationLng?: number | null
   internetSubscriptionId: string
-  /** The backend accepts 3 and nothing else - see SUBSCRIPTION_DURATION_MONTHS. */
-  subscriptionDuration: 3
+  /** The backend accepts 1, 2 or 3 and nothing else - see SUBSCRIPTION_DURATIONS. */
+  subscriptionDuration: 1 | 2 | 3
   campaignCode?: string | null
   deviceType?: DeviceType | null
   externalReferenceId?: string | null

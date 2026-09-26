@@ -99,9 +99,10 @@ describe('KYC endpoints', () => {
     expect(mock.history.get[0]?.url).toBe('/api/v1/kyc/internet-service-types')
   })
 
-  it('sends the only subscription duration the backend accepts', () => {
+  it('offers only the subscription durations the backend accepts', () => {
     // Any other value is refused with 400.
-    expect(kycApi.SUBSCRIPTION_DURATION_MONTHS).toBe(3)
+    expect([...kycApi.SUBSCRIPTION_DURATIONS]).toEqual([1, 2, 3])
+    expect(kycApi.DEFAULT_SUBSCRIPTION_DURATION).toBe(3)
   })
 
   it("mirrors the backend's analytics window limits", () => {

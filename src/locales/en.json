@@ -112,7 +112,7 @@
     "coordinates": "Coordinates",
     "subscription": "Subscription plan",
     "duration": "Duration",
-    "durationFixed": "New subscriptions are fixed at 3 months.",
+    "durationHint": "New subscriptions run for 1, 2 or 3 months.",
     "monthlyPrice": "Monthly price",
     "priceAtSubmission": "Price at submission",
     "totalPrice": "Total",
